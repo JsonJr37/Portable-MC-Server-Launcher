@@ -44,8 +44,6 @@ call :AUTHOR
 timeout /t 2 >nul
 :START
 set "choice"="0"
-cls
-call :BANNER
 rem This gets and prints the server options
 set /A COUNT=0
 for /F "tokens=1 delims==" %%I in ('set serverName[ 2^>nul') do set "%%I="
