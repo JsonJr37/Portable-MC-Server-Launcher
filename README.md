@@ -5,6 +5,6 @@
  - A portable Java JDK, would recommend https://adoptium.net/temurin/releases
  - Windows 10/11
 # How to Setup
- 1. Download the Repository
+ 1. Download the Repository / Latest Release
  2. Extract the Java you downloaded into the "java" folder
  3. Then double-click "main.bat", and your done!
