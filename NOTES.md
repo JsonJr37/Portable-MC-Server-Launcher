@@ -1,5 +1,4 @@
 # List of servers it can run:
-  Tested:
   - Vanilla
   - Paper
   - Fabric
