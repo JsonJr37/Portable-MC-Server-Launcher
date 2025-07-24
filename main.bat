@@ -52,6 +52,8 @@ for /D %%D in ("%SERVER_DIR%\*") do (
     set "serverName[!COUNT!]=%%~nxD"
 )
 if %COUNT%==0 (
+    cls
+    call :BANNER
     echo No servers were found :^(
     timeout /t 1 >nul
     cls
