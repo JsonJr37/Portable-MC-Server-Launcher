@@ -3,7 +3,7 @@
  It hase Graphical Elemets, and a server installer that I have made.
 # Requirements:
  - A portable Java JDK, would recommend https://adoptium.net/temurin/releases
- - Windows
+ - Windows 10/11
 # How to Setup
  1. Download the Repository
  2. Extract the Java you downloaded into the "java" folder
