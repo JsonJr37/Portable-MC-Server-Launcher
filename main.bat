@@ -54,11 +54,12 @@ for /D %%D in ("%SERVER_DIR%\*") do (
     set "serverName[!COUNT!]=%%~nxD"
 )
 if %COUNT%==0 (
-    echo No servers were found.
-    echo ^<Press any key to continue^>
-    pause >nul
-    exit
+    echo No servers were found :^(
+    timeout /t 1 >nul
+    cls
 )
+cls
+call :BANNER
 echo ╔═════════════════════════════════════════════ ══ ═
 echo ║ Select a Server to run, or "EXIT"
 echo ╠═══════════════════════╦═════════════════════ ══ ═
@@ -180,4 +181,6 @@ echo %ESC%[38;5;51m        ██║███████╗██║   ██�
 echo %ESC%[38;5;51m   ██   ██║╚════██║██║   ██║██║╚██╗██║██   ██║██╔══██╗        %ESC%[0m
 echo %ESC%[38;5;51m   ╚█████╔╝███████║╚██████╔╝██║ ╚████║╚█████╔╝██║  ██║        %ESC%[0m
 echo %ESC%[38;5;51m    ╚════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚════╝ ╚═╝  ╚═╝        %ESC%[0m
+echo.
+echo %ESC%[38;5;220mhttps://github.com/JsonJr37/Portable-MC-Server-Launcher%ESC%[0m
 exit /B
