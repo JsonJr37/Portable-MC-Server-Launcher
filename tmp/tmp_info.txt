@@ -1,0 +1,1 @@
+This is where the "latest" launches of the corresponding files are stored, the temporary starting files that run the server with the correct java set.

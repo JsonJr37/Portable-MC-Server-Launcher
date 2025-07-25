@@ -6,7 +6,8 @@ chcp 65001 >nul
 for /f %%A in ('"echo prompt $E| cmd"') do set "ESC=%%A"
 setlocal EnableDelayedExpansion
 set BASEDIR=%~dp0
-set SERVER_DIR=%BASEDIR%\servers
+set SERVER_DIR=%BASEDIR%servers
+set choice=0
 
 rem This sets java correctly
 set "JAVA_FOLDER="
@@ -43,7 +44,9 @@ cls
 call :AUTHOR
 timeout /t 2 >nul
 :START
-set "choice"="0"
+set "%choice%"="0"
+cls
+call :BANNER
 rem This gets and prints the server options
 set /A COUNT=0
 for /F "tokens=1 delims==" %%I in ('set serverName[ 2^>nul') do set "%%I="
@@ -52,22 +55,22 @@ for /D %%D in ("%SERVER_DIR%\*") do (
     set "serverName[!COUNT!]=%%~nxD"
 )
 if %COUNT%==0 (
-    cls
-    call :BANNER
     echo No servers were found :^(
     timeout /t 1 >nul
     cls
 )
 cls
 call :BANNER
-echo ╔═════════════════════════════════════════════ ══ ═
-echo ║ Select a Server to run, or "EXIT"
-echo ╠═══════════════════════╦═════════════════════ ══ ═
-echo ╠═{0.1} Make New Server ╚═{0.2} Delete Server
+echo ╔════════════════════════════════════════════════════════════════ ══ ═
+echo ║ Select a Server to run/edit, or type "EXIT" to close this window.
+echo ║ Also, you MAY NOT have these characters in server names: ^& ^( ^) ^| ^< ^>
+echo ║ NOTE: DO NOT RUN MULTIPLE SERVERS AT A TIME, MAY BREAK ONE OF THEM!
+echo ╠═══════════════════════╦═════════════════════╦══════════════════ ══ ═
+echo ╠═{0.1} Make New Server ╚═{0.2} Rename Server ╚═{0.3} Delete Server
 FOR /L %%i IN (1,1,%COUNT%) DO (
     echo ╠═{%%i} !serverName[%%i]!
 )
-set /p choice=╚══════════════───^>^> 
+set /p choice=╚══════════════════───^>^> 
 IF /I "%choice%"=="EXIT" exit
 IF "%choice%"=="" (
     echo %ESC%[31mInvalid Input%ESC%[0m
@@ -78,6 +81,9 @@ IF "%choice%"=="0.1" (
     goto :NewServer
 )
 IF "%choice%"=="0.2" (
+    goto :RenameServer
+)
+IF "%choice%"=="0.3" (
     goto :DeleteServer
 )
 IF %choice% LSS 1 (
@@ -98,20 +104,75 @@ call :BANNER
 echo You Selected: %SELECTED_SERVER%
 echo Starting....
 timeout /t 2 >nul
-rem Checks for any .jar file and then starts that jar file
+rem Checks for any start.bat file and then starts it with our java
 set "SERVER_PATH=%SERVER_DIR%\!SELECTED_SERVER!"
-FOR %%J IN ("%SERVER_PATH%\*.jar") DO (
-    SET "JAR_FILE=%%~nxJ"
-    goto :run
+echo Searching for start.bat...
+if exist "%SERVER_PATH%\start.bat" (
+    timeout /t 3 >nul
+    echo start.bat found, starting...
+    goto :start_bat
 )
-echo %ESC%[31mCould not find Server Jar in server '!SELECTED_SERVER!'!%ESC%[0m
-timeout /t 2 >nul
-goto :START
-:run
-start "!SELECTED_SERVER!" cmd /k "cd /d "%SERVER_PATH%" && java -Xmx4G -jar "!JAR_FILE!" nogui && exit"
-timeout /t 2 >nul
+timeout /t 3 >nul
+echo Could not find start.bat, searching for run.bat...
+if exist "%SERVER_PATH%\run.bat" (
+    timeout /t 3 >nul
+    echo run.bat found, starting...
+    goto :run_bat
+)
+timeout /t 3 >nul
+echo %ESC%[31mstart.bat and run.bat not found, needs either to run!%ESC%[0m
+echo ^<Press any key to continue^>
+pause >nul
 goto :START
 
+rem Functions for start.bat and run.bat, prefers start.bat
+:start_bat
+set "BAT=%SERVER_PATH%\start.bat"
+set "count=0"
+set "i=0"
+cd tmp
+> start.bat (
+    echo @echo off
+    echo cd "%SERVER_PATH%"
+    echo set JAVA_HOME=!JAVA_FOLDER!
+    echo set PATH=%%JAVA_HOME%%\bin;%%PATH%%
+    echo cls
+    echo.
+    for /f "usebackq delims=" %%a in ("%BAT%") do (
+        set "line=%%a"
+        echo !line!
+        )
+    echo exit
+)
+start "!SELECTED_SERVER!" start.bat
+cd ..
+timeout /t 3 >nul
+goto :START
+
+:run_bat
+set "BAT=%SERVER_PATH%\run.bat"
+set "count=0"
+set "i=0"
+cd tmp
+> run.bat (
+    echo @echo off
+    echo cd "%SERVER_PATH%"
+    echo set JAVA_HOME=!JAVA_FOLDER!
+    echo set PATH=%%JAVA_HOME%%\bin;%%PATH%%
+    echo cls
+    echo.
+    for /f "usebackq delims=" %%a in ("%BAT%") do (
+        set "line=%%a"
+        echo !line!
+        )
+    echo exit
+)
+start "!SELECTED_SERVER!" run.bat
+cd ..
+timeout /t 3 >nul
+goto :START
+
+rem Other functions for server managment
 :NewServer
 cls
 call :BANNER
@@ -119,7 +180,7 @@ echo Starting Server Creater...
 start cmd /k "cd /d "%SERVER_DIR%" && java -jar ServerInstaller.jar && exit"
 timeout /t 3 >nul
 set /p "SERVER_NAME=What do you want your server to be called: "
-echo Renaming Server...
+echo Naming Server...
 timeout /t 3 >nul
 ren "%SERVER_DIR%\server" "%SERVER_NAME%"
 goto :START
@@ -131,6 +192,7 @@ echo What Server do you want to delete?
 FOR /L %%i IN (1,1,%COUNT%) DO (
     echo %%i. !serverName[%%i]!
 )
+echo.
 set /p "choice=Enter your choice here: "
 set "SERVER_TO_DELETE=!serverName[%choice%]!"
 echo Deleting server '!SERVER_TO_DELETE!'
@@ -142,6 +204,22 @@ if errorlevel 1 (
     echo Folder deleted successfully.
 )
 timeout /t 2 >nul
+goto :START
+
+:RenameServer
+cls
+call :BANNER
+echo What server do you want to rename?
+FOR /L %%i IN (1,1,%COUNT%) DO (
+    echo %%i. !serverName[%%i]!
+)
+echo.
+set /p "choice=Enter your choice here: "
+set "SERVER_TO_RENAME_OLD=!serverName[%choice%]!"
+set /p "SERVER_TO_RENAME_NEW=What do you want your server to be called: "
+echo Renaming server '!SERVER_TO_RENAME_OLD!' to '!SERVER_TO_RENAME_NEW!'
+timeout /t 3 >nul
+ren "%SERVER_DIR%\!SERVER_TO_RENAME_OLD!" "!SERVER_TO_RENAME_NEW!"
 goto :START
 
 rem This is the "Functions"
