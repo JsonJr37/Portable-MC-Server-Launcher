@@ -3,7 +3,7 @@
   - Vanilla
   - Paper
   - Fabric
-  - NeoForge
+  - NeoForge - will need to setup manually
 # List of servers it cannot run:
   - anything without run.bat / start.bat
 # Untested Servers:
