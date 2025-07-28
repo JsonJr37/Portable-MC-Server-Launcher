@@ -1,0 +1,5 @@
+@echo off
+cd "%SERVER_PATH%"
+set JAVA_HOME=!JAVA_FOLDER!
+set PATH=%JAVA_HOME%\bin;%PATH%
+cls

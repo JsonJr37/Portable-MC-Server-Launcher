@@ -35,6 +35,9 @@ echo Current Java Path: %JAVA_HOME%
 echo.
 echo Current Java Version:
 java -version
+echo.
+echo Current bat_inject.txt contents: ^(may change^)
+type tmp\bat_inject.txt
 timeout /t 2 >nul
 cls
 
@@ -131,13 +134,12 @@ set "BAT=%SERVER_PATH%\start.bat"
 set "count=0"
 set "i=0"
 cd tmp
+rem the bat_inject file does not need changing, if you change it, the file is not read with batch functions
 > start.bat (
-    echo @echo off
-    echo cd "%SERVER_PATH%"
-    echo set JAVA_HOME=!JAVA_FOLDER!
-    echo set PATH=%%JAVA_HOME%%\bin;%%PATH%%
-    echo cls
-    echo.
+    for /f "usebackq delims=" %%a in ("bat_inject.txt") do (
+        set "line=%%a"
+        echo !line!
+        )
     for /f "usebackq delims=" %%a in ("%BAT%") do (
         set "line=%%a"
         echo !line!
@@ -155,12 +157,10 @@ set "count=0"
 set "i=0"
 cd tmp
 > run.bat (
-    echo @echo off
-    echo cd "%SERVER_PATH%"
-    echo set JAVA_HOME=!JAVA_FOLDER!
-    echo set PATH=%%JAVA_HOME%%\bin;%%PATH%%
-    echo cls
-    echo.
+    for /f "usebackq delims=" %%a in ("bat_inject.txt") do (
+        set "line=%%a"
+        echo !line!
+        )
     for /f "usebackq delims=" %%a in ("%BAT%") do (
         set "line=%%a"
         echo !line!

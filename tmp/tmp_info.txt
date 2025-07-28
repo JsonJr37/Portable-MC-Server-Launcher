@@ -1,1 +1,14 @@
 This is where the "latest" launches of the corresponding files are stored, the temporary starting files that run the server with the correct java set.
+
+The bat_inject.txt file is what code gets injected into the starter bat files
+The default_bat_inject.txt is the default injecting file layout
+
+For making your own bat_inject.txt file:
+Variables to pay attention to when making your own bat inject file:
+ - %BAT% is the path to the bat file
+ - %SERVER_PATH% is the location of the server folder
+ - %SELECTED_SERVER% is the selected server
+ - %SERVER_DIR% is the server data folder
+
+Last notes:
+You NEED to keep at least the default_bat_inject.txt stuff, because you need to set java, and this is bare minimum
